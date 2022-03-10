@@ -1,0 +1,73 @@
+* {
+  font-family: 'Industry, sans-serif';
+}
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #202020;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+@font-face {
+  font-family: 'Vampire_Wars';
+  src: local('Vampire_Wars'), url(fonts/Vampire_Wars.ttf) format('truetype');
+  /* other formats include: 'woff2', 'truetype, 'opentype',
+                            'embedded-opentype', and 'svg' */
+}
+@font-face {
+  font-family: 'Industry';
+  src: url('https://assets.website-files.com/6139adf6df04f11e7a03ebc7/6139b80a29c5f04f6ee99c04_Industry-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Industry';
+  src: url('https://assets.website-files.com/6139adf6df04f11e7a03ebc7/6139b80a79c185b2dda049ac_Industry-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Industry';
+  src: url('https://assets.website-files.com/6139adf6df04f11e7a03ebc7/6139b80a8731ac5486b918b2_Industry-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Industry demi';
+  src: url('https://assets.website-files.com/6139adf6df04f11e7a03ebc7/6139b80adc7738a5f6eb5954_Industry-Demi.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Industry';
+  src: url('https://assets.website-files.com/6139adf6df04f11e7a03ebc7/6139b80a18399249af098d0b_Industry-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Industry';
+  src: url('https://assets.website-files.com/6139adf6df04f11e7a03ebc7/6139b80ab930186af03bb109_Industry-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Industry';
+  src: url('https://assets.website-files.com/6139adf6df04f11e7a03ebc7/6139b80be2504e05fec6e19b_Industry-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}

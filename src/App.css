@@ -1,0 +1,214 @@
+.pagination_container {
+  margin-top: 15px !important;
+  margin-bottom: 15px !important;
+  color:  #fff !important;
+}
+
+.modal_custommint {
+  color: #FFFFFF;
+  font-size: 22px;
+  font-weight: bold;
+  vertical-align: middle;
+}
+
+.icon_btn {
+  color:  #fff !important;
+}
+
+.custommint_refresh_header {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.close_btn_container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.modal_progress {
+  color: #F10841 !important;
+}
+
+.modal_progress_container {
+  display: flex;
+  justify-content: center;
+  margin: 25px auto;
+}
+
+.MuiButtonBase-root.card_btn {
+  color:  #DADADA !important;
+}
+
+.MuiButtonBase-root {
+  color:  #fff !important;
+}
+.MuiFormLabel-root.Mui-focused {
+  color: white !important;
+}
+.MuiInputLabel-outlined {
+  color: white !important;
+}
+.MuiButtonBase-root.Mui-selected {
+  color: #555555 !important;
+  border-color: #555555 !important;
+  background-color: rgb(255 255 255 / 12%);
+}
+.MuiOutlinedInput-notchedOutline {
+  border-color: #DADADA !important;
+}
+
+.MuiPaginationItem-ellipsis,.MuiSvgIcon-root {
+  color: #FFFFFF !important;
+}
+
+.MuiPaginationItem-root:not(.MuiPaginationItem-ellipsis,.Mui-selected):hover {
+  background-color: #626163 !important;
+}
+
+.MuiInputBase-input {
+  color: #FFFFFF !important;
+}
+
+.MuiButton-label {
+  justify-content: center !important;
+  text-transform: uppercase !important
+}
+
+.MuiMenu-list {
+  background-color: #222222 !important;
+}
+.swiper-slide{
+  min-width: 32% !important
+}
+.search-collection-container {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 30px;
+}
+.search-collection {
+  width: 300px;
+  align-self: center;
+  margin-right: 17px !important;
+}
+#input_siteurl {
+  font-family: 'Courier New', Courier, monospace !important;
+}
+.extract_machine_state {
+  margin-top: 30px;
+}
+.extract_machine_state * {
+  font-family: 'Courier New', Courier, monospace !important;
+}
+
+.terminator-logo {
+  width: 249px;
+  height: 266px;
+  transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); 
+  opacity: 1; visibility: visible; 
+  transform-style: preserve-3d;
+  margin-top: 86px;
+}
+.logo-container {
+  display: flex;
+  justify-content: space-between;
+
+}
+.title {
+  margin-bottom: 24px;
+  font-family: Industry, sans-serif;
+  color: #eee;
+  font-size: 49px;
+  line-height: 1.2em;
+  letter-spacing: 4px;
+}
+.title-container {
+  width: 75%;
+}
+.root {
+  flex-grow: 1;
+  background-size: cover;
+  padding-top: 20px;
+  padding-bottom: 50px;
+}
+.extractBtn {
+  border-radius: 30;
+  background-color: '#712587'
+}
+.description {
+  background-color: #282828;
+  padding: 14px;
+  border: 2px solid;
+  border-color: #454444;
+  border-radius: 10px;
+  border-style: outset;
+  margin: 0 20px;
+}
+.description-title {
+    font-size: 20px;
+    color: #8d4ff6;
+    padding-top: 20px;
+    padding-bottom: 10px;
+}
+.description-content {
+  color: #999;
+  padding-bottom: 1px;
+}
+.custom-mint {
+  border: 2px solid;
+  border-color: #454444;
+  border-radius: 10px;
+  border-style: outset;
+  background-color: #282828;
+  margin: 0 20px;
+  margin-top: 20px;
+}
+.custom-mint-container {
+  margin-top: 15px;
+  margin-right: 30px;
+  margin-left: 30px;
+}
+.sub-title {
+  width: 120px;
+  padding-left: 17px;
+}
+.sub-title  p {
+  padding: 10px 0;
+  color: #8a47ca;
+}
+.custom-content {
+  width: 100%;
+  display: flex;
+}
+.custom-input>div>div>div{
+ padding: 12px 14px;
+}
+.custom-input>div>div>input{
+  padding: 12px 14px;
+}
+.btn-custom {
+  color: black !important;
+  width: 94%;
+  padding: 8px !important;
+  background-color: #8bc34a !important;
+  margin: 9px 3% !important;
+}
+.upcoming-drop-cards {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  width: 100%;
+}
+.MuiBox-root-46 {
+  top: 50%;
+  left: 50%;
+  color: rgb(255, 255, 255);
+  width: 480px;
+  border: 2px solid rgb(0, 0, 0);
+  padding: 48px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  box-shadow: rgb(218 218 218 / 59%) 0px 20.9428px 37.5225px -6.10831px;
+  background-color: rgb(33 33 33);
+  border-radius: 30px;
+}

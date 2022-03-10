@@ -1,0 +1,175 @@
+.avatar-media {
+	  display: block;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 95%;
+    height: 280px;
+    padding: 7px;
+    border-radius: 15px;
+}
+.card_btn_container>.card_btn_count_down {
+  color: #f7f3f3!important;
+  border-radius: 11px;
+  margin: 7px;
+  width: 95%;
+  height: 47px;
+  align-self: center;
+  background-color: #e91e63;
+}
+.MuiButtonBase-root.card_btn {
+	color:  #DADADA !important;
+}
+.card_btn_container>.card_btn {
+  color: #000!important;
+  border-radius: 11px;
+  margin: 7px;
+  width: 95%;
+  height: 47px;
+  align-self: center;
+  background-color: #8bc34a;
+}
+.MuiButtonBase-root.card_contain_btn {
+	color:  #fff !important;
+	background-color: #DADADA !important;
+}
+
+.MuiButtonBase-root.card_outline_btn {
+	color:  #DADADA !important;
+	border-color: #DADADA !important;
+}
+
+.icon_btn {
+	color:  #fff !important;
+}
+
+.icon_btn:hover {
+	background-color: #151315 !important;
+}
+
+
+.card_btn_container {
+
+}
+
+.minting_refresh_header {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 10px;
+}
+
+.modal_minting {
+	color: #FFFFFF;
+	font-size: 22px;
+	font-weight: bold;
+	vertical-align: middle;
+}
+
+.close_btn_container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.minting_btn_container {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 15px;
+}
+
+.minting_btn_container > button {
+	margin-left: 10px;
+}
+
+.icon_btn {
+  color:  #fff !important;
+}
+
+.modal_progress {
+  color: #F10841 !important;
+}
+
+.modal_progress_container {
+  display: flex;
+  justify-content: center;
+  margin: 25px auto;
+}
+
+.minting_list {
+	margin-top: 10px;
+	color: #FFFFFF;
+	font-size: 20px;
+}
+.letter {
+    color: 'white';
+}
+.cm-name {
+    font-size: 20;
+}
+.mint-action {
+  
+}
+.nftcard {
+    border-radius: 20;
+    margin: 10px;
+    color: 'white';
+    background-color: '#16151a';
+}
+.nfticon {
+    color: 'white';
+}
+.card {
+    min-width: 275;
+    border: 'none';
+    color: 'white';
+    box-shadow: 'none';
+    background-color: 'transparent';
+    margin-bottom: 20;
+}
+
+.bullet {
+    display: 'inline-block',;
+    margin: '0 2px';
+    transform: 'scale(0.8)';
+}
+.margin {
+    margin: 5px;
+}
+.paper {
+    height: 100;
+    background-color: brown;
+    padding: 5px;
+    text-align: 'center';
+    color: #DADADA;
+}
+.nft-card {
+  margin: 9px 3%;
+  background-color: #1b1a1a;
+  border-radius: 15px;
+}
+.icon_vote {
+  width: 35px;
+
+}
+.vote_container {
+  display: flex;
+  justify-content: space-between;
+}
+.btn-icon {
+  padding: 3px !important;
+}
+.like_vote {
+  display: flex;
+    align-items: center;
+}
+.dislike_vote {
+  display: flex;
+  align-items: center;
+}
+.vote {
+  display: flex;
+}
+.vote_content {
+  padding: 8px;
+  font-size: 20px;
+}
