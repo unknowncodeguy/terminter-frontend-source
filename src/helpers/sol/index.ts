@@ -11,7 +11,7 @@ import { Metadata, METADATA_SCHEMA } from '../schema';
 
 type SolanaNFTMetadata = { type: SolanaNFTType; url: string }
 
-const SOLANA_CLUSTER_ENDPOINT = 'https://api.mainnet-beta.solana.com'
+const SOLANA_CLUSTER_ENDPOINT = process.env.REACT_APP_SOLANA_RPC_HOST!;
 const METADATA_PROGRAM_ID_PUBLIC_KEY = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s')
 const METADATA_REPLACE = new RegExp('\u0000', 'g');
 

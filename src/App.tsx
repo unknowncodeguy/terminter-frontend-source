@@ -25,13 +25,10 @@ import { WalletDialogProvider } from "@solana/wallet-adapter-material-ui";
 import { createTheme, ThemeProvider } from "@material-ui/core";
 
 import { SolanaClient, SolanaClientProps } from './helpers/sol';
-const candyMachineId = new anchor.web3.PublicKey(
-  process.env.REACT_APP_CANDY_MACHINE_ID!
-);
 
 const network = process.env.REACT_APP_SOLANA_NETWORK as WalletAdapterNetwork;
 
-const rpcHost = "https://api.mainnet-beta.solana.com";
+const rpcHost = process.env.REACT_APP_SOLANA_RPC_HOST!;
 const connection = new anchor.web3.Connection(rpcHost);
 
 const solanaClient = new SolanaClient({ rpcEndpoint: rpcHost } as SolanaClientProps);
@@ -74,7 +71,7 @@ const MainContainer = styled.div`
 `;
 
 const App = () => {
-  const endpoint = useMemo(() => clusterApiUrl(network), []);
+  const endpoint = useMemo(() => rpcHost, []);
 
   const wallets = useMemo(
     () => [
@@ -93,7 +90,6 @@ const App = () => {
           <WalletProvider wallets={wallets} autoConnect={true}>
             <WalletDialogProvider>
               <Home
-                candyMachineId={candyMachineId}
                 connection={connection}
                 txTimeout={txTimeout}
                 rpcHost={rpcHost}
