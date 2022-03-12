@@ -47,7 +47,6 @@ const UseStyles = makeStyles((theme) => ({
   nftcard: {
     display: 'flex',
     borderRadius: 20,
-    margin: 16,
     color: 'white',
     backgroundColor: '#3c0c4a',
     border: 'inset',
@@ -95,14 +94,7 @@ margin-bottom: -5px;
 `
 
 const mintingModalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 480,
-  bgcolor: '#010001',
   color: '#fff',
-  border: '2px solid #000',
   boxShadow: 'rgb(218 218 218 / 59%) 0px 20.9428px 37.5225px -6.10831px',
   p: 6,
 }
@@ -457,11 +449,13 @@ const Nftcard = (props: NftcardProps) => {
   return (
     <>
       <div className="nft-card">
-        <CardMedia
-          className='avatar-media'
-          image={props.info.image_url}
-          title="Paella dish"
-        />
+        <div className={`imageWrapper imageWrapper-75`}>
+          <div className={`imageOver`}>
+            <img src={props.info.image_url} className="border-radius-16" alt="Collection Image"/>
+          </div>
+        </div>
+
+
         <div className="mint-action">
           <CardContent>
             <Typography
@@ -470,14 +464,13 @@ const Nftcard = (props: NftcardProps) => {
               component="p"
             >
               
-              <div className="vote_container">
-                <div >
-                  <span className={classes.cmName}>Name: {props.info.machine_collection}</span>
-                  <br/>
-                  <span className={classes.cmName}>Type: {props.info.machine_type}</span>
+              <div className="align-items-center vote_container">
+                <div className="col-12">
+                  <span className={classes.cmName}>{props.info.machine_collection}</span>
+                  
                 </div>
                 
-                <div className="vote">
+                <div className="vote justify-content-between">
                   <div className="like_vote">
                     <IconButton
                       className="btn-icon"
@@ -487,6 +480,7 @@ const Nftcard = (props: NftcardProps) => {
                     </IconButton>  
                     <span className="vote_content">{like > 1000? (like/1000).toString().slice(0,3) + `k`: like}</span>
                   </div>
+
                   <div className="dislike_vote">
                       <IconButton
                         onClick={() => {setVote(props.info.machine_id, false)}}
@@ -497,25 +491,44 @@ const Nftcard = (props: NftcardProps) => {
                       <span className="vote_content">{dislike > 1000? (dislike/1000).toString().slice(0,3) + `k`: dislike}</span>
                   </div>
                 </div>
+
               </div>
               
-              <DivPublicKey>
-                ID:   
-                {props.info.machine_id}
-              </DivPublicKey>
-              <CopyToClipboard>
-                {({ copy }) => (
-                  <IconButton
-                  onClick={() => copy(props.info.machine_id.toString())}
-                  >
-                    <AssignmentTurnedIn/>
-                  </IconButton>
-                )}
-              </CopyToClipboard>
-              <br />
-              Start Date:  {props.info.go_live_date != null ? new Date(props.info.go_live_date * 1000).toLocaleString() : 'Not Set'}
-              <br />
-              {'Price: ' + props.info.price}
+              <Grid container direction="row" justifyContent="space-between" alignItems="center">
+                <Grid item md={2}>
+                  ID:
+                </Grid>
+                <Grid item md={6}>
+                  {`${props.info.machine_id.substring(0,4)}...${props.info.machine_id.substring(props.info.machine_id.length - 4, props.info.machine_id.length)}`}
+                  <CopyToClipboard>
+                    {({ copy }) => (
+                      <IconButton
+                      onClick={() => copy(props.info.machine_id.toString())}
+                      >
+                        <AssignmentTurnedIn/>
+                      </IconButton>
+                    )}
+                  </CopyToClipboard>
+                </Grid>
+                <Grid item md={2}>
+                  Type:
+                </Grid>
+                <Grid item md={2}>
+                  {props.info.machine_type}
+                </Grid>
+                <Grid item md={2}>
+                  Start:
+                </Grid>
+                <Grid item md={6}>
+                  {props.info.go_live_date != null ? new Date(props.info.go_live_date * 1000).toLocaleString() : 'Not Set'}
+                </Grid>
+                <Grid item md={2}>
+                  Price:
+                </Grid>
+                <Grid item md={2}>
+                {props.info.price}
+                </Grid>
+              </Grid>
             </Typography>
           </CardContent>
 
@@ -549,83 +562,144 @@ const Nftcard = (props: NftcardProps) => {
           </div>
         </div>
       </div>
+
       <Modal
         open={mintingOpen}
         onClose={handleMintingClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={mintingModalStyle}>
+        <Box sx={mintingModalStyle} className='mui-box'>
           <Typography >
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <div className="minting_refresh_header">
                 <div className="modal_minting">{props.info.machine_type}</div>
-                {/* <div>
+                <div>
                   <IconButton aria-label="refresh" className="icon_btn">
                     <RefreshIcon />
                   </IconButton>
-                </div> */}
+                </div>
               </div>
-            </Grid>
+            </Grid> */}
+            <div className="d-flex align-items-center justify-content-between minting_list">
+                <p className="font-900">
+                  Type: 
+                </p>
+                <p>
+                  {props.info.machine_type}
+                </p>
+            </div>
+
             {progressState == true &&
               <Grid item xs={12}>
                 <div className="modal_progress_container">
                   <CircularProgress className="modal_progress"/>
                 </div>
-                <div className="close_btn_container">
-                  <Button onClick={handleMintingClose} className="card_btn">CLOSE</Button>
-                </div>
               </Grid>
             }
+
             {progressState == false &&
               <Grid item xs={12}>
-                <div className="minting_list">
-                  Available: {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
+                <div className="d-flex align-items-center justify-content-between minting_list">
+                    <p className="font-900">
+                      Available:
+                    </p>
+                    <p>
+                      {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
+                    </p>
                 </div>
-                <div className="minting_list">
-                  Collection Name: {machine ? props.info.machine_collection : ''}
+
+                <div className="d-flex align-items-center justify-content-between minting_list">
+                    <p className="font-900">
+                      Collection Name:
+                    </p>
+                    <p>
+                      {machine ? props.info.machine_collection : ''}
+                    </p>
                 </div>
-                <div className="minting_list">
-                  Machine Id: {machine ? <DivPublicKey>{props.info.machine_id}</DivPublicKey> : ''}
-                  {machine && <CopyToClipboard>
-                    {({ copy }) => (
-                      <IconButton
-                      onClick={() => copy(props.info.machine_id.toString())}
-                      >
-                        <AssignmentTurnedIn/>
-                      </IconButton>
-                    )}
-                  </CopyToClipboard>}
-                  
+
+                <div className="d-flex align-items-center justify-content-between minting_list">
+                    <p className="font-900">
+                      Machine Id:
+                    </p>
+                    <div className="d-flex align-items-center justify-content-between machine-id">
+                      <p>{machine ? `${props.info.machine_id.substring(0, 4)}...${props.info.machine_id.substring(props.info.machine_id.length -4 , props.info.machine_id.length)}` : ''}</p>
+                      <div>
+                        {machine && <CopyToClipboard>
+                          {({ copy }) => (
+                            <IconButton
+                            onClick={() => copy(props.info.machine_id.toString())}
+                            className="ml-8 pt-0 pb-0 pl-0 pr-0"
+                            >
+                              <AssignmentTurnedIn/>
+                            </IconButton>
+                          )}
+                        </CopyToClipboard>}
+                      </div>
+
+                    </div>
                 </div>
-                <div className="minting_list">
-                  Price: {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
+
+                <div className="d-flex align-items-center justify-content-between minting_list">
+                    <p className="font-900">
+                      Price:
+                    </p>
+                    <p>
+                      {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
+                    </p>
                 </div>
-                
-                <div className="minting_list">
-                  Start date: {machine ? toDate(machine.state.goLiveDate)?.toString() : ''}
+
+                <div className="d-flex align-items-center justify-content-between minting_list">
+                    <p className="font-900">
+                      Start date:
+                    </p>
+                    <p>
+                      {machine ? new Date(toDate(machine.state.goLiveDate)?.toString()).toLocaleString() : ''}
+                    </p>
                 </div>
-                <div className="minting_list">
-                  Captcha: {machine && machine.state.gatekeeper != null ? 'Yes' : 'No Required'}
+
+                <div className="d-flex align-items-center justify-content-between minting_list">
+                    <p className="font-900">
+                      Captcha:
+                    </p>
+                    <p>
+                      {machine && machine.state.gatekeeper != null ? 'Yes' : 'No Required'}
+                    </p>
                 </div>
-                <div className="minting_list">
-                  Status: {machine && machine.state.isSoldOut ? 'SoldOut' : machine?.state.isActive ? 'Live' : 'Not Live'}
+
+                <div className="d-flex align-items-center justify-content-between minting_list">
+                    <p className="font-900">
+                      Status:
+                    </p>
+                    <p>
+                      {machine && machine.state.isSoldOut ? 'SoldOut' : machine?.state.isActive ? 'Live' : 'Not Live'}
+                    </p>
                 </div>
-                <div className="minting_list">
-                  Times tried: 0
-                </div>
-                <div className="minting_btn_container">
-                  {progressState == false &&
-                    <>
-                      <Button onClick={handleOneMint} variant="contained" className="card_contain_btn">MINT</Button>
-                      <Button onClick={handleBeforeMultiMint} variant="outlined" className="card_outline_btn">MINT AUTO</Button>
-                      <Button onClick={handleAfterMultiMint} variant="outlined" className="card_outline_btn">M.A.I</Button>
-                    </>
-                  }
-                  <Button onClick={handleMintingClose} className="card_btn">CLOSE</Button>
+
+                <div className="d-flex align-items-center justify-content-between minting_list">
+                    <p className="font-900">
+                      Times tried:
+                    </p>
+                    <p>
+                      0
+                    </p>
                 </div>
               </Grid>
             }
+              <Grid item xs={12}>
+                <div className="mt-16">
+                  <div className="d-flex align-items-center justify-content-between">
+                    {progressState == false &&
+                      <>
+                        <Button onClick={handleOneMint} variant="outlined" className="card_contain_btn">MINT</Button>
+                        <Button onClick={handleBeforeMultiMint} variant="outlined" className="card_outline_btn">MINT AUTO</Button>
+                        <Button onClick={handleAfterMultiMint} variant="outlined" className="card_outline_btn">M.A.I</Button>
+                      </>
+                    }
+                    <Button onClick={handleMintingClose} variant="outlined" className="card_btn">CLOSE</Button>
+                  </div>
+                </div>
+              </Grid>
           </Typography>
         </Box>
       </Modal>

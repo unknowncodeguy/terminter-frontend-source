@@ -82,11 +82,7 @@
 .swiper-slide{
   min-width: 32% !important
 }
-.search-collection-container {
-  display: flex;
-  justify-content: space-between;
-  padding-bottom: 30px;
-}
+
 .search-collection {
   width: 300px;
   align-self: center;
@@ -113,7 +109,8 @@
 .logo-container {
   display: flex;
   justify-content: space-between;
-
+  min-height: calc(100vh - 121px - 20px - 50px);
+  align-items: center;
 }
 .title {
   margin-bottom: 24px;
@@ -124,7 +121,9 @@
   letter-spacing: 4px;
 }
 .title-container {
-  width: 75%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .root {
   flex-grow: 1;
@@ -138,7 +137,7 @@
 }
 .description {
   background-color: #282828;
-  padding: 14px;
+  padding: 16px;
   border: 2px solid;
   border-color: #454444;
   border-radius: 10px;
@@ -146,10 +145,8 @@
   margin: 0 20px;
 }
 .description-title {
-    font-size: 20px;
-    color: #8d4ff6;
-    padding-top: 20px;
-    padding-bottom: 10px;
+    font-size: 22px;
+    color: white;
 }
 .description-content {
   color: #999;
@@ -188,23 +185,33 @@
   padding: 12px 14px;
 }
 .btn-custom {
-  color: black !important;
-  width: 94%;
+  color: white !important;
+  width: 100%;
   padding: 8px !important;
-  background-color: #8bc34a !important;
-  margin: 9px 3% !important;
+  background: #323132 !important;
+  transition: all 0.3s;
+
+  margin: 0 20px;
+  margin-top: 20px;
+
+  border: groove !important;
+  border-radius: 9;
+
 }
+.btn-custom:hover {
+  background: #282728 !important;
+}
+
 .upcoming-drop-cards {
   display: grid;
   grid-template-columns: auto auto auto;
   width: 100%;
 }
-.MuiBox-root-46 {
+.mui-box {
   top: 50%;
   left: 50%;
   color: rgb(255, 255, 255);
   width: 480px;
-  border: 2px solid rgb(0, 0, 0);
   padding: 48px;
   position: absolute;
   transform: translate(-50%, -50%);

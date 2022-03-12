@@ -85,6 +85,7 @@ export class SolanaClient {
             .map(({ mint, tokenAccount }) => ({ mint, tokenAccount }))
           return { mintAddresses }
         })
+        
       const nfts = await Promise.all(
         potentialNFTsByOwnerAddress.map(async ({ mintAddresses }) => {
           const programAddresses: any = await Promise.all(
@@ -104,6 +105,7 @@ export class SolanaClient {
               }
             }
           ))
+          
           let accountInfos: any[] = [];
           for (let cur = 0; cur < programAddresses.length;) {
             let subAddresses = programAddresses.slice(cur, cur + 100);
@@ -117,6 +119,7 @@ export class SolanaClient {
             account,
             ...programAddresses[index]
           }))
+          
           const nonNullInfos = accountInfos?.filter((info: any) => info.account) ?? []
           let metadataList: any[] = [];
           let tokenInfoList: any [] = [];
@@ -131,7 +134,9 @@ export class SolanaClient {
     
               tokenInfoList.push(nonNullInfos[i]);
             }
+            
           }
+          
           const results = await Promise.all(
             metadataList.map(async item =>
               fetch(item!.data.uri)
@@ -139,18 +144,19 @@ export class SolanaClient {
                 .catch(() => null)
             )
           )
-          
+          console.log('results', results);
+          console.log('tokenInfoList', tokenInfoList);
           const metadatas = results.map((metadata, i) => ({
             metadata,
             ...metadataList[i],
             ...tokenInfoList[i]
           }))
-
+          console.log('metadatas', metadatas);
           let newMetadata: any[] = metadatas.filter(meta => !!meta.metadata)
           return newMetadata;
         })
       )
-
+      console.log('nfts', nfts);
       const solanaCollectibles = await Promise.all(
         nfts.map(async (nftsForAddress, i) => {
           const collectibles = await Promise.all(
@@ -158,7 +164,7 @@ export class SolanaClient {
               async (nft: any) => await solanaNFTToCollectible(nft.metadata, wallets[i], nft.type)
             )
           )
-          console.log('collectibles', collectibles);
+          
           let newCollectibles: any = [];
           collectibles.forEach((collect, index) => {
             if (collect) {

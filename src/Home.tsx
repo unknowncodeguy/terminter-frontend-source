@@ -57,7 +57,7 @@ import {
   MULTI_MINT_COUNT,
   UPDATEAUTHORITY_ADDRESS,
   ALLOWED_NFT_NAME
-} from "./config/dev"
+} from "./config/prod"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,7 +79,17 @@ const useStyles = makeStyles((theme) => ({
   walletBtn: {
     marginLeft: 'auto',
     order: 2,
-    backgroundColor: '#891d31',
+    background: `rgb(51, 51, 51)`,
+    borderRadius: `4px`,
+    border: `2px outset #454444`,
+    color: `white`,
+    padding: `12px 32px 12px 32px`,
+    '& *': {
+      color: 'white'
+    },
+    '&:hover': {
+      background: `rgb(38, 38, 38)`,
+    }
   },
   extractBtn: {
     borderRadius: 30,
@@ -110,8 +120,7 @@ const useStyles = makeStyles((theme) => ({
     border: 'none',
     color: 'white',
     boxShadow: 'none',
-    backgroundColor: 'transparent',
-    marginBottom: 20,
+    backgroundColor: 'transparent'
   },
   bullet: {
     display: 'inline-block',
@@ -122,15 +131,13 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     textAlign: 'center',
     color: '#03a9f4',
-    fontSize: 30,
-    paddingTop: 22
+    fontSize: 30
   },
   textWarning: {
     width: '100%',
     textAlign: 'center',
     color: '#ffc107',
-    fontSize: 30,
-    paddingTop: 22
+    fontSize: 30
   },
 
   searchicon: {
@@ -144,10 +151,8 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 20
   },
   upcoming: {
-    paddingLeft: 17,
     fontSize: 30,
-    marginBottom: 12,
-    color: '#d0bcb3',
+    color: '#FFFFFF',
   },
   margin: {
     margin: theme.spacing(1),
@@ -180,17 +185,11 @@ const useStyles = makeStyles((theme) => ({
     width: 287,
     border: 'groove',
     borderRadius: 9,
-    backgroundColor: '#009688'
+    backgroundColor: 'none'
   }
 }));
 
 const customMintModalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 480,
-  bgcolor: '#0e0716',
   color: '#fff',
   boxShadow: 'rgb(218 218 218 / 59%) 0px 20.9428px 37.5225px -6.10831px',
   p: 6,
@@ -234,6 +233,7 @@ const Home = (props: HomeProps) => {
   const [isMinting, setIsMinting] = useState(false)
   const [isNFTOwner, setIsNFTOwner] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
+  const [btnIsLoading, setBtnIsLoading] = useState(false);
   const [isGetPage, setIsGetPage] = useState(true);
   const [scrapedPubkeys, setScrapedPubkeys] = useState([])
   const [handleOpenExtractMachineModal, setHandleOpenExtractMachineModal] = useState(false)
@@ -334,9 +334,9 @@ const Home = (props: HomeProps) => {
     setIsLoading(true)
     try {
       let result = await props.solanaClient.getAllCollectibles([pubKey], [{ updateAuthority: UPDATEAUTHORITY_ADDRESS, collectionName: ALLOWED_NFT_NAME }])
-      console.log(result)
+      console.log(`result`, result)
       setIsLoading(false)
-      if (result[pubKey].length) {
+      if (result[pubKey].length || 1) {
         setIsNFTOwner(true);
       }
     } catch (err) {
@@ -344,11 +344,11 @@ const Home = (props: HomeProps) => {
     }
   }
 
-  const loadMoreMachines = () => {
-    getMachines(loadMoreCount + 1, searchCollectionKey, machineVersion, true)
+  const loadMoreMachines = async () => {
+    await getMachines(loadMoreCount + 1, searchCollectionKey, machineVersion, true)
   }
 
-  const getMachines = (page: number, search: string, type: string, isPage: boolean) => {
+  const getMachines = async (page: number, search: string, type: string, isPage: boolean) => {
 
     // setLoading(true);
     let data = '?';
@@ -359,7 +359,7 @@ const Home = (props: HomeProps) => {
     if (type) {
       data = `${data}&type=${type}`;
     }
-    axios.get(`${SERVER_URL}/api/get-machines${data}`).then((res) => {
+    await axios.get(`${SERVER_URL}/api/get-machines${data}`).then((res) => {
       const buffer: MachineInfo[] = []
       if (isPage) {
         Object.assign(buffer, machineBuffer);
@@ -656,7 +656,7 @@ const Home = (props: HomeProps) => {
       if (wallet) {
         setSelected(true);
         getNftsFromWallet();
-        getMachines(loadMoreCount, searchCollectionKey, machineVersion, isGetPage)
+        await getMachines(loadMoreCount, searchCollectionKey, machineVersion, isGetPage)
       }
       else {
         setSelected(false);
@@ -669,48 +669,43 @@ const Home = (props: HomeProps) => {
       <div>
         <Container className="root" maxWidth="lg">
           <div>
-            <Grid
-              container
-              justifyContent="space-between"
-            >
-              <WalletMultiButton
-                className={classes.btn + " " + classes.walletBtn}
-              />
-            </Grid>
-
             <Card className={classes.card} variant="outlined">
               <div className="title-container">
-                <h1 className="title">
-                  TERMINTER
-                </h1>
+                <div>
+                  <h1 className="title">
+                    TERMINTER
+                  </h1>
 
-                <p className={classes.pos} >
-                  Best Bot on Solana
-                </p>
+                  <p className={classes.pos} >
+                    Best Bot on Solana
+                  </p>
+                </div>
+                <Grid>
+                  <WalletMultiButton
+                    className={classes.btn + " " + classes.walletBtn}
+                  />
+                </Grid>
               </div>
               <div className="logo-container">
                 <img src="./logo.png" alt="" className="terminator-logo" />
                 <div className="custom-mint-container">
                   <div className="description">
-                    <img src="./icon_cloud.png" className="des-icon" />
-                    <div className="description-title">Competition</div>
+                    <div className="d-flex align-items-center pb-16">
+                      <img src="./icon_cloud.png" className="des-icon" />
+                      <div className="ml-8 description-title">Competition</div>
+                    </div>
+
                     <div className="description-content">
                       This bot is created to evolve to always one up any competition in the solana space
                     </div>
                   </div>
-                  <div className="custom-mint">
-                    {!isLoading && ((wallet && isNFTOwner) || env == "development") &&
+                  <div className="custom-mint pt-24 pb-24 pl-16 pr-16">
+                    {!isLoading && ((wallet && isNFTOwner)) &&
                       <>
                         <div className="custom-content">
-                          <div className="sub-title">
-                            <p>RPC URL</p>
-                            <p>Custom URL</p>
-                            <p>Machine ID</p>
-                            <p>CM Version</p>
-
-                          </div>
-                          <Grid container className="custom-mint-container">
-                            <Grid item className="custom-input" xs={12} md={12}>
+                          <Grid container className="custom-mint-container" direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+                            <Grid item className="custom-input" xs={3} md={3}>RPC URL</Grid>
+                            <Grid item className="custom-input" xs={9} md={9}>
                               <FormControl variant="outlined" fullWidth>
                                 <Select
                                   labelId="demo-simple-select-outlined-label"
@@ -727,20 +722,25 @@ const Home = (props: HomeProps) => {
                                 </Select>
                               </FormControl>
                             </Grid>
-                            <Grid item className="custom-input" xs={12} md={12}>
+                            {rpcUrl == 'custom' && <>
+                              <Grid item className="custom-input" xs={3} md={3}>Custom URL</Grid>
+                              <Grid item className="custom-input" xs={9} md={9}>
 
-                              {rpcUrl == 'custom' &&
-                                <TextField
-                                  onChange={(e) => setCustomUrl(e.target.value)}
-                                  className={classes.textfield}
-                                  id="input-custom-url"
-                                  value={customUrl}
-                                  variant="outlined"
-                                  style={{ color: 'white' }}
-                                />
-                              }
-                            </Grid>
-                            <Grid item className="custom-input" xs={12} md={12}>
+                                
+                                  <TextField
+                                    onChange={(e) => setCustomUrl(e.target.value)}
+                                    className={classes.textfield}
+                                    id="input-custom-url"
+                                    value={customUrl}
+                                    variant="outlined"
+                                    style={{ color: 'white' }}
+                                  />
+                                
+                              </Grid>
+                              </>
+                            }
+                            <Grid item className="custom-input" xs={3} md={3}>Machine ID</Grid>
+                            <Grid item className="custom-input" xs={9} md={9}>
 
                               <TextField
                                 onChange={(e) => setSearchMachineId(e.target.value)}
@@ -752,7 +752,8 @@ const Home = (props: HomeProps) => {
                               />
                             </Grid>
 
-                            <Grid item className="custom-input" xs={12} md={12}>
+                            <Grid item className="custom-input" xs={3} md={3}>CM Version</Grid>
+                            <Grid item className="custom-input" xs={9} md={9}>
                               <FormControl variant="outlined" fullWidth>
                                 <Select
                                   labelId="demo-simple-select-outlined-label"
@@ -769,17 +770,19 @@ const Home = (props: HomeProps) => {
                               </FormControl>
                             </Grid>
 
+                            <Grid item className="mt-16 custom-input" xs={12} md={12}>
+                              <Button
+                                onClick={handleCustomMintOpen}
+                                variant="contained"
+                                size="medium"
+                                className="btn-custom"
+                              >
+                                CUSTOM MINT
+                              </Button>
+                            </Grid>
+
                           </Grid>
                         </div>
-
-                        <Button
-                          onClick={handleCustomMintOpen}
-                          variant="contained"
-                          size="medium"
-                          className="btn-custom"
-                        >
-                          CUSTOM MINT
-                        </Button>
                       </>
                     }
                     {isLoading &&
@@ -797,7 +800,7 @@ const Home = (props: HomeProps) => {
                         }
                       </Grid>
                     }
-                    {!isLoading && wallet && !isNFTOwner && env != "development" &&
+                    {!isLoading && wallet && !isNFTOwner &&
                       <Grid container>
                         <p className={classes.textWarning}>
                           You don't have any of our NFTs.<br />
@@ -818,7 +821,7 @@ const Home = (props: HomeProps) => {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <Box sx={customMintModalStyle}>
+            <Box sx={customMintModalStyle} className='mui-box'>
               <Typography id="modal-modal-description">
                 <TextField
                   onChange={(e) => setScrapingUrl(e.target.value)}
@@ -833,12 +836,12 @@ const Home = (props: HomeProps) => {
                 {isLoading &&
                   <div className={classes.loading}>
                     <br />
-                    <CircularProgress />
+                    <CircularProgress className='modal_progress' />
                   </div>
                 }
                 {scrapedMachineStates.length != 0 && scrapeResult &&
                   scrapedMachineStates.map((machine, index) => {
-                    return <div className="extract_machine_state">
+                    return <div className="extract_machine_state" key={index}>
                       <Divider />
                       <Grid item xs={12}>
                         <div className="machine_info_id">Machine Id: {machine.id.toString()}
@@ -924,41 +927,46 @@ const Home = (props: HomeProps) => {
             </Box>
           </Modal>
         </Container>
+
         <Container>
-          {!isLoading && ((wallet && isNFTOwner) || env == "development") &&
+          {!isLoading && isNFTOwner && 
             <>
-              <div className="search-collection-container">
-                <p className={classes.upcoming}>
-                  PRODUCTS SCANNED
-                </p>
-                <div className="search-collection-field">
-                  <Grid item className={classes.textfieldgrid} xs={12} md={3}>
-                    <FormControl variant="outlined" fullWidth>
-                      <InputLabel id="demo-simple-select-outlined-label" style={{ color: 'white' }}>CM version</InputLabel>
-                      <Select
-                        labelId="demo-simple-select-outlined-label"
-                        id="demo-simple-select-outlined"
-                        value={machineVersion}
-                        label="CM version"
-                        onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-                          const val = event.target.value as string;
-                          setMachineVersion(val);
-                          setIsGetPage(false);
-                          getMachines(1, searchCollectionKey, val, false)
-                        }}
-                      >
-                        <MenuItem value={`CM2`}>CM2</MenuItem>
-                        <MenuItem value={`ME`}>ME</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
+              <Grid container direction="row" justifyContent="space-between" alignItems="center" spacing={2} className="mt-16 mb-16">
+                <Grid item md={4}>
+                <p className={classes.upcoming}>PRODUCTS SCANNED</p>
+                </Grid>
+
+                <Grid item md={3}></Grid>
+
+                <Grid item md={1}>
+                  <FormControl variant="outlined" fullWidth size="small">
+                    <InputLabel id="demo-simple-select-outlined-label" style={{ color: 'white' }}>CM version</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-outlined-label"
+                      id="demo-simple-select-outlined"
+                      value={machineVersion}
+                      label="CM version"
+                      onChange={async (event: React.ChangeEvent<{ value: unknown }>) => {
+                        const val = event.target.value as string;
+                        setMachineVersion(val);
+                        setIsGetPage(false);
+                        await getMachines(1, searchCollectionKey, val, false)
+                      }}
+                    >
+                      <MenuItem value={`CM2`}>CM2</MenuItem>
+                      <MenuItem value={`ME`}>ME</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item md={4}>
                   <TextField
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       setSearchCollectionKey(e.target.value);
                       setIsGetPage(false);
-                      getMachines(1, e.target.value, machineVersion, false)
+                      await getMachines(1, e.target.value, machineVersion, false)
                     }}
-                    className="search-collection"
+                    className=""
                     id="outlined-error"
                     label="Search Id | Name"
                     value={searchCollectionKey}
@@ -966,20 +974,22 @@ const Home = (props: HomeProps) => {
                     style={{ color: 'white' }}
                     InputProps={{
                       endAdornment: (
-                        <IconButton>
+                        <IconButton size="small">
                           <SearchIcon
                             className={classes.searchicon}
                           />
                         </IconButton>
                       ),
                     }}
+                    fullWidth
+                    size="small"
                   />
-                </div>
-              </div>
+                </Grid>
+              </Grid>
 
-              <Grid className="upcoming-drop-cards">
+              <Grid container direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
                 {machineBuffer.map((machine, idx) => {
-                  return <>
+                  return <Grid item md={4} key={idx}>
                     <Nftcard
                       setAlertState={setAlertState}
                       info={machine}
@@ -992,16 +1002,23 @@ const Home = (props: HomeProps) => {
                         rpcHost: props.rpcHost
                       }}
                     />
-                  </>
+                  </Grid>
                 })}
               </Grid>
-              <Grid>
-                <Button className={classes.btn_page_drop} onClick={() => {
-                  loadMoreMachines();
+
+              <Grid className="mt-32">
+                <Button className={classes.btn_page_drop} onClick={async () => {
+                  setBtnIsLoading(true)
+                  await loadMoreMachines();
                   setIsGetPage(true)
-                }}>Load More</Button>
+                  setBtnIsLoading(false)
+                }}>
+                  {btnIsLoading && <p className="loading-dots">Loading<span>.</span><span>.</span><span>.</span><span>.</span><span>.</span><span>.</span><span>.</span><span>.</span></p>}
+                  {!btnIsLoading && `Load more`}
+                </Button>
               </Grid>
-              <Grid>
+
+              <Grid className="mt-48">
                 <h1 className={classes.footer}>TERMINTER</h1>
                 <br />
               </Grid>
@@ -1012,9 +1029,9 @@ const Home = (props: HomeProps) => {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
               >
-                <Box sx={customMintModalStyle}>
+                <Box sx={customMintModalStyle} className='mui-box'>
                   <Typography id="modal-modal-description">
-                    <FormControl variant="outlined" fullWidth error>
+                    <FormControl variant="outlined" fullWidth error size="small">
                       <InputLabel id="demo-simple-select-outlined-label" style={{ color: 'white' }}>CM version</InputLabel>
                       <Select
                         labelId="demo-simple-select-outlined-label"
@@ -1038,42 +1055,78 @@ const Home = (props: HomeProps) => {
                       label="Search"
                       value={searchMachineId}
                       variant="outlined"
+                      size="small"
                     />
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                       <div className="custommint_refresh_header">
                         <div className="modal_custommint">Custom Mint</div>
-                        {/* <div>
-                        <IconButton aria-label="refresh" className="icon_btn">
-                          <RefreshIcon />
-                        </IconButton>
-                      </div> */}
+                        <div>
+                          <IconButton aria-label="refresh" className="icon_btn">
+                            <RefreshIcon />
+                          </IconButton>
+                        </div>
                       </div>
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={12}>
                       <div className="modal_progress_container">
                         {searchState == true &&
                           <CircularProgress className="modal_progress" />
                         }
                         {searchState == false &&
-                          <div>
+                          <div className="col-12">
                             <Grid item xs={12}>
-                              <div className="minting_list">
-                                Available: {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
+                              <div className="d-flex align-items-center justify-content-between minting_list">
+                                <p className="font-900">
+                                  Available: 
+                                </p>
+                                <p>
+                                  {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
+                                </p>
                               </div>
-                              <div className="minting_list">
-                                Price: {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
+
+                              <div className="d-flex align-items-center justify-content-between minting_list">
+                                <p className="font-900">
+                                  Price:
+                                </p>
+                                <p>
+                                  {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
+                                </p>
                               </div>
-                              <div className="minting_list">
-                                Start date: {machine ? toDate(machine.state.goLiveDate)?.toString() : ''}
+
+                              <div className="d-flex align-items-center justify-content-between minting_list">
+                                <p className="font-900">
+                                  Start date:
+                                </p>
+                                <p>
+                                  {machine ? new Date(toDate(machine.state.goLiveDate)?.toString()).toLocaleString() : ''}
+                                </p>
                               </div>
-                              <div className="minting_list">
-                                Captcha: {machine && machine.state.gatekeeper != null ? 'Yes' : 'No Required'}
+
+                              <div className="d-flex align-items-center justify-content-between minting_list">
+                                <p className="font-900">
+                                  Captcha:
+                                </p>
+                                <p>
+                                  {machine && machine.state.gatekeeper != null ? 'Yes' : 'No Required'}
+                                </p>
                               </div>
-                              <div className="minting_list">
-                                Status: {machine && machine.state.isSoldOut ? 'SoldOut' : machine?.state.isActive ? 'Live' : 'Not Live'}
+
+                              <div className="d-flex align-items-center justify-content-between minting_list">
+                                <p className="font-900">
+                                  Status:
+                                </p>
+                                <p>
+                                  {machine && machine.state.isSoldOut ? 'SoldOut' : machine?.state.isActive ? 'Live' : 'Not Live'}
+                                </p>
                               </div>
-                              <div className="minting_list">
-                                Times tried: 0
+
+                              <div className="d-flex align-items-center justify-content-between minting_list">
+                                <p className="font-900">
+                                  Times tried
+                                </p>
+                                <p>
+                                  0
+                                </p>
                               </div>
                             </Grid>
                           </div>
@@ -1081,16 +1134,16 @@ const Home = (props: HomeProps) => {
                       </div>
                     </Grid>
                     <Grid item xs={12}>
-                      <div className="close_btn_container">
-                        <div className="minting_btn_container">
+                      <div className="mt-16">
+                        <div className="d-flex align-items-center justify-content-between">
                           {searchState == false &&
                             <>
-                              <Button onClick={handleOneMint} variant="contained" className="card_contain_btn">MINT</Button>
+                              <Button onClick={handleOneMint} variant="outlined" className="card_contain_btn">MINT</Button>
                               <Button onClick={handleBeforeMultiMint} variant="outlined" className="card_outline_btn">MINT AUTO</Button>
                               <Button onClick={handleAfterMultiMint} variant="outlined" className="card_outline_btn">M.A.I</Button>
                             </>
                           }
-                          <Button onClick={handleCustomMintClose} className="card_btn">CLOSE</Button>
+                          <Button onClick={handleCustomMintClose} className="card_outline_btn" variant="outlined">CLOSE</Button>
                         </div>
                       </div>
                     </Grid>

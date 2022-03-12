@@ -3,17 +3,13 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    width: 95%;
-    height: 280px;
-    padding: 7px;
     border-radius: 15px;
 }
 .card_btn_container>.card_btn_count_down {
   color: #f7f3f3!important;
   border-radius: 11px;
-  margin: 7px;
-  width: 95%;
-  height: 47px;
+  width: 100%;
+  height: 46px;
   align-self: center;
   background-color: #e91e63;
 }
@@ -23,9 +19,8 @@
 .card_btn_container>.card_btn {
   color: #000!important;
   border-radius: 11px;
-  margin: 7px;
-  width: 95%;
-  height: 47px;
+  width: 100%;
+  height: 46px;
   align-self: center;
   background-color: #8bc34a;
 }
@@ -100,6 +95,9 @@
 	color: #FFFFFF;
 	font-size: 20px;
 }
+.minting_list .machine-id {
+
+}
 .letter {
     color: 'white';
 }
@@ -143,12 +141,12 @@
     color: #DADADA;
 }
 .nft-card {
-  margin: 9px 3%;
   background-color: #1b1a1a;
   border-radius: 15px;
+  padding: 8px;
 }
 .icon_vote {
-  width: 35px;
+  width: 30px;
 
 }
 .vote_container {
@@ -156,7 +154,7 @@
   justify-content: space-between;
 }
 .btn-icon {
-  padding: 3px !important;
+
 }
 .like_vote {
   display: flex;
@@ -170,6 +168,5 @@
   display: flex;
 }
 .vote_content {
-  padding: 8px;
   font-size: 20px;
 }

@@ -1,4 +1,8 @@
+import "./styles/normalize.css";
+import "./styles/fonts.css";
+import "./styles/utils.css";
 import "./App.css";
+
 import Home from "./Home";
 import { useMemo } from "react";
 import * as anchor from "@project-serum/anchor";
@@ -27,7 +31,7 @@ const candyMachineId = new anchor.web3.PublicKey(
 
 const network = process.env.REACT_APP_SOLANA_NETWORK as WalletAdapterNetwork;
 
-const rpcHost = "https://api.devnet.solana.com";
+const rpcHost = "https://api.mainnet-beta.solana.com";
 const connection = new anchor.web3.Connection(rpcHost);
 
 const solanaClient = new SolanaClient({ rpcEndpoint: rpcHost } as SolanaClientProps);

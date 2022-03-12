@@ -15,7 +15,7 @@ export interface AlertState {
 
 export const toDate = (value?: anchor.BN) => {
   if (!value) {
-    return;
+    return ``;
   }
 
   return new Date(value.toNumber() * 1000);
