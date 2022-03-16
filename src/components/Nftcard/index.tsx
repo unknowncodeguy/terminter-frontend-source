@@ -1,4 +1,4 @@
-import {useState, useMemo} from "react";
+import {useState, useMemo, useEffect} from "react";
 import * as anchor from "@project-serum/anchor";
 import styled from "styled-components";
 import {LAMPORTS_PER_SOL, PublicKey} from "@solana/web3.js";
@@ -111,7 +111,8 @@ interface MachineInfo {
   dislike: number,
   total_items: number,
   go_live_date: number,
-  captcha: boolean
+  captcha: boolean,
+  remain: boolean
 }
 
 export interface NftcardProps {
@@ -119,11 +120,14 @@ export interface NftcardProps {
   selected: boolean;
   mint: boolean;
   multi_mint_count: number;
+  notSoldOut: boolean;
   chain: {
     connection: anchor.web3.Connection;
     txTimeout: number;
     rpcHost: string;
   },
+  customUrl: string;
+  rpcUrl: string;
   setAlertState: (payload: any) => void,
 }
 
@@ -135,6 +139,7 @@ const Nftcard = (props: NftcardProps) => {
   const [isCompleteCountDown, setIsCompleteCountDown] = useState(false);
   const [isMinting, setIsMinting] = useState(false)
   const [machine, setMachine] = useState<any>();
+  const [remain, setRemain] = useState<any>(false);
   const [like, setLike] = useState(props.info.like);
   const [dislike, setDislike] = useState(props.info.dislike)
   const wallet = useAnchorWallet();
@@ -234,7 +239,7 @@ const Nftcard = (props: NftcardProps) => {
 
   const handleBeforeMultiMint = async () => {
     const now = new Date().getTime();
-    const startMachine = machine ? machine.state.goLiveDate.toNumber() * 1000 : now;
+    const startMachine = machine ? (machine.state?.goLiveDate?.toNumber() || 0) * 1000  : now;
     let timeOut = now - startMachine;
     timeOut = timeOut < 0 ? 100 : timeOut;
 
@@ -415,6 +420,7 @@ const Nftcard = (props: NftcardProps) => {
                 machine_id: cndy.id.toString(),
                 is_soldout: cndy.state.isSoldOut
               }
+              console.log('cndy', cndy);
               await axios.post(`${SERVER_URL}/api/status-edit`, statusEdit)
               setMachine({...machine, ...cndy});
               setProgressState(false);
@@ -545,6 +551,13 @@ const Nftcard = (props: NftcardProps) => {
             style={{ margin: 20 }}
             onComplete={() => {setIsCompleteCountDown(true)}}
           />
+          </Button> :
+          props.info.remain?
+          <Button 
+            disabled={true} 
+            onClick={() => {}}
+            className="card_btn_count_down">
+              SOLD OUT
           </Button>
              : props.selected?
           <Button 
@@ -590,15 +603,18 @@ const Nftcard = (props: NftcardProps) => {
                 </p>
             </div>
 
-            {progressState == true &&
+            {(progressState == true || !machine || machine.state?.itemsRemaining < 1) &&
               <Grid item xs={12}>
                 <div className="modal_progress_container">
-                  <CircularProgress className="modal_progress"/>
+                  {progressState == true && <CircularProgress className="modal_progress"/>}
+                  {!progressState && (!machine || machine.state?.itemsRemaining < 1) && 
+                    <p className="text-center">SOLD OUT</p>
+                  }
                 </div>
               </Grid>
             }
 
-            {progressState == false &&
+            {progressState == false && machine?.state?.itemsRemaining > 0 &&
               <Grid item xs={12}>
                 <div className="d-flex align-items-center justify-content-between minting_list">
                     <p className="font-900">
@@ -645,7 +661,7 @@ const Nftcard = (props: NftcardProps) => {
                       Price:
                     </p>
                     <p>
-                      {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
+                      {machine ? (machine.state?.price?.toNumber() || 0) / LAMPORTS_PER_SOL : ''}
                     </p>
                 </div>
 
@@ -689,7 +705,7 @@ const Nftcard = (props: NftcardProps) => {
               <Grid item xs={12}>
                 <div className="mt-16">
                   <div className="d-flex align-items-center justify-content-between">
-                    {progressState == false &&
+                    {progressState == false && machine?.state?.itemsRemaining > 0 &&
                       <>
                         <Button onClick={handleOneMint} variant="outlined" className="card_contain_btn">MINT</Button>
                         <Button onClick={handleBeforeMultiMint} variant="outlined" className="card_outline_btn">MINT AUTO</Button>

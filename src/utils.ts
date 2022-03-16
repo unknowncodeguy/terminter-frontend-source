@@ -18,7 +18,7 @@ export const toDate = (value?: anchor.BN) => {
     return ``;
   }
 
-  return new Date(value.toNumber() * 1000);
+  return new Date((value?.toNumber() || 0) * 1000);
 };
 
 const numberFormater = new Intl.NumberFormat('en-US', {
@@ -40,7 +40,7 @@ export const formatNumber = {
       return undefined;
     }
 
-    return val.toNumber() / LAMPORTS_PER_SOL;
+    return (val?.toNumber() || 0) / LAMPORTS_PER_SOL;
   },
 };
 

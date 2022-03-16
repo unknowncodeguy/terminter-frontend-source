@@ -207,8 +207,8 @@ export const getCandyMachineCM2State = async (
   const program = new anchor.Program(idl, CANDY_MACHINE_PROGRAM_V2, provider);
 
   const state: any = await program.account.candyMachine.fetch(candyMachineId);
-  const itemsAvailable = state.data.itemsAvailable.toNumber();
-  const itemsRedeemed = state.itemsRedeemed.toNumber();
+  const itemsAvailable = state.data?.itemsAvailable?.toNumber() || 0;
+  const itemsRedeemed = state?.itemsRedeemed?.toNumber() || 0;
   const itemsRemaining = itemsAvailable - itemsRedeemed;
 
   return {
@@ -220,14 +220,14 @@ export const getCandyMachineCM2State = async (
       itemsAvailable,
       itemsRedeemed,
       itemsRemaining,
-      isSoldOut: itemsRemaining === 0,
+      isSoldOut: itemsRemaining < 1,
       isActive:
         state.data.goLiveDate &&
-        state.data.goLiveDate.toNumber() < new Date().getTime() / 1000 &&
+        state.data?.goLiveDate?.toNumber() < new Date().getTime() / 1000 &&
         (state.endSettings
           ? state.endSettings.endSettingType.date
-            ? state.endSettings.number.toNumber() > new Date().getTime() / 1000
-            : itemsRedeemed < state.endSettings.number.toNumber()
+            ? state.endSettings?.number?.toNumber() > new Date().getTime() / 1000
+            : itemsRedeemed < state.endSettings?.number?.toNumber()
           : true),
       goLiveDate: state.data.goLiveDate,
       treasury: state.wallet,
@@ -435,7 +435,7 @@ export const mintOneCM2Token = async (
         transferAuthority.publicKey,
         payer,
         [],
-        candyMachine.state.price.toNumber(),
+        candyMachine.state?.price?.toNumber() || 0,
       ),
     );
     cleanupInstructions.push(
@@ -658,7 +658,7 @@ for(let index = 0; index < quantity; index++) {
         transferAuthority.publicKey,
         payer,
         [],
-        candyMachine.state.price.toNumber(),
+        candyMachine.state?.price?.toNumber() || 0,
       ),
     );
     cleanupInstructions.push(

@@ -214,7 +214,8 @@ interface MachineInfo {
   dislike: number,
   total_items: number,
   go_live_date: number,
-  captcha: boolean
+  captcha: boolean,
+  remain: boolean
 }
 
 const Home = (props: HomeProps) => {
@@ -335,7 +336,7 @@ const Home = (props: HomeProps) => {
       let result = await props.solanaClient.getAllCollectibles([pubKey], [{ updateAuthority: UPDATEAUTHORITY_ADDRESS, collectionName: ALLOWED_NFT_NAME }])
       console.log(`result`, result)
       setIsLoading(false)
-      if (result[pubKey].length || 1) {
+      if (result[pubKey].length) {
         setIsNFTOwner(true);
       }
     } catch (err) {
@@ -464,7 +465,7 @@ const Home = (props: HomeProps) => {
 
   const handleBeforeMultiMint = async () => {
     const now = Date.now();
-    const startMachine = machine ? machine.state.goLiveDate.toNumber() * 1000 : now;
+    const startMachine = machine ? (machine.state?.goLiveDate?.toNumber() || 0) * 1000 : now;
     let timeOut = now - startMachine;
     timeOut = timeOut < 0 ? 100 : timeOut;
 
@@ -868,7 +869,7 @@ const Home = (props: HomeProps) => {
                             ItemsRedeemed: {machine ? `${machine.state.itemsRedeemed}` : ''}
                           </div>
                           <div className="machine_info">
-                            Price: {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
+                            Price: {machine ? (machine.state?.price?.toNumber() || 0) / LAMPORTS_PER_SOL : ''}
                           </div>
                           <div className="machine_info">
                             GoLiveDate: {machine ? toDate(machine.state.goLiveDate)?.toString() : ''}
@@ -894,7 +895,7 @@ const Home = (props: HomeProps) => {
                                 </CopyToClipboard>
                               </div>
                               <div className="machine_info">
-                                DiscountPrice: {machine.state.whitelistMintSettings.discountPrice ? machine.state.whitelistMintSettings.discountPrice.toNumber() / LAMPORTS_PER_SOL : '0'}
+                                DiscountPrice: {machine.state.whitelistMintSettings.discountPrice ? (machine.state.whitelistMintSettings?.discountPrice?.toNumber() || 0) / LAMPORTS_PER_SOL : '0'}
                               </div>
                             </div>
                           }
@@ -994,12 +995,15 @@ const Home = (props: HomeProps) => {
                       info={machine}
                       mint={!selected}
                       selected={selected}
+                      notSoldOut={false}
                       multi_mint_count={MULTI_MINT_COUNT}
                       chain={{
                         connection: props.connection,
                         txTimeout: props.txTimeout,
                         rpcHost: props.rpcHost
                       }}
+                      customUrl={customUrl}
+                      rpcUrl={rpcUrl}
                     />
                   </Grid>
                 })}
@@ -1043,7 +1047,7 @@ const Home = (props: HomeProps) => {
                         }}
                       >
                         <MenuItem value={`CM2`}>v2</MenuItem>
-                        {/* <MenuItem value={`ME`}>ME</MenuItem> */}
+                        <MenuItem value={`ME`}>ME</MenuItem>
                       </Select>
                     </FormControl>
                     <TextField
@@ -1088,7 +1092,7 @@ const Home = (props: HomeProps) => {
                                   Price:
                                 </p>
                                 <p>
-                                  {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
+                                  {machine ? (machine.state?.price?.toNumber() || 0) / LAMPORTS_PER_SOL : ''}
                                 </p>
                               </div>
 
@@ -1115,7 +1119,7 @@ const Home = (props: HomeProps) => {
                                   Status:
                                 </p>
                                 <p>
-                                  {machine && machine.state.isSoldOut ? 'SoldOut' : machine?.state.isActive ? 'Live' : 'Not Live'}
+                                  {machine && machine.state.is ? '' : machine?.state.isActive ? 'Live' : 'Not Live'}
                                 </p>
                               </div>
 

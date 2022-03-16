@@ -205,8 +205,8 @@ export const getCandyMachineMEState = async (
   console.log(idl)
   const state: any = await program.account.candyMachine.fetch(candyMachineId);  
   console.log(state);
-  const itemsAvailable = state.itemsAvailable.toNumber();
-  const itemsRedeemed = state.itemsRedeemedNormal.toNumber();
+  const itemsAvailable = state.itemsAvailable?.toNumber() || 0;
+  const itemsRedeemed = state.itemsRedeemedNormal?.toNumber() || 0;
   const itemsRemaining = itemsAvailable - itemsRedeemed;
 
   return {
@@ -218,8 +218,8 @@ export const getCandyMachineMEState = async (
       itemsAvailable,
       itemsRedeemed,
       itemsRemaining,
-      itemsRedeemedRaffle: state.itemsRedeemedRaffle.toNumber(),
-      isSoldOut: itemsRemaining === 0,
+      itemsRedeemedRaffle: state.itemsRedeemedRaffle?.toNumber(),
+      isSoldOut: itemsRemaining < 1,
       treasury: state.wallet,
       tokenMint: state.tokenMint,
       bump: state.bump,
