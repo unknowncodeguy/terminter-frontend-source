@@ -11,6 +11,7 @@ import TextField from '@material-ui/core/TextField';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import Backdrop from '@material-ui/core/Backdrop';
 import Container from '@material-ui/core/Container';
 import Modal from '@material-ui/core/Modal';
 import Typography from '@material-ui/core/Typography';
@@ -716,7 +717,7 @@ const Home = (props: HomeProps) => {
                                     setRPCUrl(val);
                                   }}
                                 >
-                                  <MenuItem value={`https://solana-api.projectserum.com`}>GenesysGo(https://solana-api.projectserum.com)</MenuItem>
+                                  <MenuItem value={`https://solana-api.projectserum.com/`}>GenesysGo(https://solana-api.projectserum.com)</MenuItem>
                                   <MenuItem value={`https://api.metaplex.solana.com`}>Metaplex(https://api.metaplex.solana.com)</MenuItem>
                                   <MenuItem value={`custom`}>Custom({customUrl})</MenuItem>
                                 </Select>
@@ -1075,7 +1076,7 @@ const Home = (props: HomeProps) => {
                         {searchState == true &&
                           <CircularProgress className="modal_progress" />
                         }
-                        {searchState == false &&
+                        {searchState == false && machine && machine?.state?.itemsRemaining > 0 &&
                           <div className="col-12">
                             <Grid item xs={12}>
                               <div className="d-flex align-items-center justify-content-between minting_list">
@@ -1134,14 +1135,18 @@ const Home = (props: HomeProps) => {
                             </Grid>
                           </div>
                         }
+
+                        {searchState == false && machine && machine?.state?.itemsRemaining < 1 &&
+                          <p className="text-center">SOLD OUT</p>
+                        }
                       </div>
                     </Grid>
                     <Grid item xs={12}>
                       <div className="mt-16">
                         <div className="d-flex align-items-center justify-content-between">
-                          {searchState == false &&
+                          {searchState == false && machine && machine?.state?.itemsRemaining > 0 &&
                             <>
-                              <Button onClick={handleOneMint} variant="outlined" className="card_contain_btn">MINT</Button>
+                              <Button onClick={handleOneMint} variant="outlined" className="card_outline_btn">MINT</Button>
                               <Button onClick={handleBeforeMultiMint} variant="outlined" className="card_outline_btn">MINT AUTO</Button>
                               <Button onClick={handleAfterMultiMint} variant="outlined" className="card_outline_btn">M.A.I</Button>
                             </>
@@ -1151,7 +1156,11 @@ const Home = (props: HomeProps) => {
                       </div>
                     </Grid>
                   </Typography>
+                  <Backdrop style={{zIndex: 999, color: '#fff'}} open={isMinting}>
+                    <CircularProgress color="inherit" />
+                  </Backdrop>
                 </Box>
+
               </Modal>
             </>
           }

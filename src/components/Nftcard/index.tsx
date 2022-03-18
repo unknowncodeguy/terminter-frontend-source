@@ -9,6 +9,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
+import Backdrop from '@material-ui/core/Backdrop';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
@@ -143,6 +144,8 @@ const Nftcard = (props: NftcardProps) => {
   const [like, setLike] = useState(props.info.like);
   const [dislike, setDislike] = useState(props.info.dislike)
   const wallet = useAnchorWallet();
+
+  const [open, setOpen] = useState(false);
 
   const anchorWallet = useMemo(() => {
     if (
@@ -411,7 +414,7 @@ const Nftcard = (props: NftcardProps) => {
               }
               if(props.info.machine_type == "ME") {
                 cndy = await getCandyMachineMEState(
-                  anchorWallet,
+                  wallet as anchor.Wallet,
                   new PublicKey(props.info.machine_id),
                   props.chain.connection
                 );
@@ -422,7 +425,7 @@ const Nftcard = (props: NftcardProps) => {
               }
               console.log('cndy', cndy);
               await axios.post(`${SERVER_URL}/api/status-edit`, statusEdit)
-              setMachine({...machine, ...cndy});
+              setMachine(cndy);
               setProgressState(false);
             } catch (e) {
               console.log("Problem getting candy machine state");
@@ -707,7 +710,7 @@ const Nftcard = (props: NftcardProps) => {
                   <div className="d-flex align-items-center justify-content-between">
                     {progressState == false && machine?.state?.itemsRemaining > 0 &&
                       <>
-                        <Button onClick={handleOneMint} variant="outlined" className="card_contain_btn">MINT</Button>
+                        <Button onClick={handleOneMint} variant="outlined" className="card_outline_btn">MINT</Button>
                         <Button onClick={handleBeforeMultiMint} variant="outlined" className="card_outline_btn">MINT AUTO</Button>
                         <Button onClick={handleAfterMultiMint} variant="outlined" className="card_outline_btn">M.A.I</Button>
                       </>
@@ -717,9 +720,12 @@ const Nftcard = (props: NftcardProps) => {
                 </div>
               </Grid>
           </Typography>
+          <Backdrop style={{zIndex: 999, color: '#fff'}} open={isMinting}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
         </Box>
+
       </Modal>
-      {/* </Grid> */}
     </>
   );
 }

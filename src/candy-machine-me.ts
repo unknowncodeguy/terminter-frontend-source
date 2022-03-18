@@ -2,8 +2,9 @@ import * as anchor from "@project-serum/anchor";
 import * as bs58 from "bs58";
 import {
   MintLayout,
-  TOKEN_PROGRAM_ID,
   Token,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID
 } from "@solana/spl-token";
 import { SystemProgram } from '@solana/web3.js';
 import { sendTransactions, getUnixTs } from './connection';
@@ -13,10 +14,15 @@ import {
   SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
 } from './utils';
 import axios from "axios";
+import { config } from "process";
 
 export const CANDY_MACHINE_PROGRAM_ME = new anchor.web3.PublicKey(
   "CMZYPASGWeTz7RNGHaRJfCq2XQ5pYK6nDvVQxzkH51zb"
 );
+
+// const TOKEN_PROGRAM_ID = new anchor.web3.PublicKey(
+//   "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+// ); 
 
 const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -25,6 +31,8 @@ const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
 const WRAPPED_SOL_ADDRESS = new anchor.web3.PublicKey(
   "So11111111111111111111111111111111111111112"
 );
+
+
 
 const notaryUrl = "https://wk-notary-prod.magiceden.io/sign"
 
@@ -56,7 +64,8 @@ interface CandyMachineState {
   bump: number,
   authority:  anchor.web3.PublicKey,
   raffleSeed: number,
-  raffleTicketsPurchased: number
+  raffleTicketsPurchased: number,
+  orderInfo:anchor.web3.PublicKey
 }
 
 export const awaitTransactionSignatureConfirmation = async (
@@ -200,15 +209,11 @@ export const getCandyMachineMEState = async (
     preflightCommitment: 'recent',
   });
   const idl = await anchor.Program.fetchIdl(CANDY_MACHINE_PROGRAM_ME, provider);
-  console.log(idl);
   const program = new anchor.Program(idl, CANDY_MACHINE_PROGRAM_ME, provider);
-  console.log(idl)
   const state: any = await program.account.candyMachine.fetch(candyMachineId);  
-  console.log(state);
   const itemsAvailable = state.itemsAvailable?.toNumber() || 0;
   const itemsRedeemed = state.itemsRedeemedNormal?.toNumber() || 0;
   const itemsRemaining = itemsAvailable - itemsRedeemed;
-
   return {
     id: candyMachineId,
     program,
@@ -225,7 +230,8 @@ export const getCandyMachineMEState = async (
       bump: state.bump,
       authority: state.authority,
       raffleSeed: state.raffleSeed,
-      raffleTicketsPurchased: state.raffleTicketsPurchased
+      raffleTicketsPurchased: state.raffleTicketsPurchased,
+      orderInfo: state.orderInfo,
     }
   };
 };
@@ -293,6 +299,12 @@ export const mintOneMEToken = async (
 ): Promise<string> => {
   const mint = anchor.web3.Keypair.generate();
   const token = await getTokenWallet(payer, mint.publicKey);
+  const u = await Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    mint.publicKey,
+    payer
+  );
   const { program } = candyMachine;
   const metadata = await getMetadata(mint.publicKey);
   const masterEdition = await getMasterEdition(mint.publicKey);
@@ -304,102 +316,112 @@ export const mintOneMEToken = async (
   const [walletLimitInfo, walletLimitBump] = await getWalletLimitInfo(
     candyMachine.id, payer
   );
-  console.log("walletLimitInfo", walletLimitInfo.toString())
-  
-  const tx = program.transaction.mintNft(walletLimitBump ,{
-    accounts: {
-      config: candyMachine.state.config,
-      candyMachine: candyMachine.id,
-      payer: payer,
-      launchStagesInfo: launchStagesInfo,
-      wallet: candyMachine.state.treasury,
-      mint: mint.publicKey,
-      metadata,
-      masterEdition,
-      walletLimitInfo: walletLimitInfo,
-      mintAuthority: payer,
-      updateAuthority: payer,
-      tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      systemProgram: anchor.web3.SystemProgram.programId,
-      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-      clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
-    },
-    signers: [mint],
-    remainingAccounts: [{
-        pubkey: WRAPPED_SOL_ADDRESS,
-        isWritable: true,
-        isSigner: false
-    }, {
-        pubkey: payer,
-        isWritable: false,
-        isSigner: false
-    },{
-        pubkey: new anchor.web3.PublicKey("71R43w8efa2H6T3pQR7Hif8nj5A3ow2bnx6dAzYJBffP") || anchor.web3.SystemProgram.programId,
-        isWritable: false,
-        isSigner: true
-    }],
-    instructions: [
-      anchor.web3.SystemProgram.createAccount({
-        fromPubkey: payer,
-        newAccountPubkey: mint.publicKey,
-        space: MintLayout.span,
-        lamports: rent,
-        programId: TOKEN_PROGRAM_ID,
-      }),
-      
-      // new anchor.web3.TransactionInstruction({
-      //   keys: a,
-      //   programId: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
-      //   data: Buffer.from([]),
-      // }),
-      new anchor.web3.TransactionInstruction({
-        programId: new anchor.web3.PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
-        data: Buffer.from(bs58.encode(Buffer.from("we live to fight another day"))),
-        keys: []
-      }),
-      Token.createInitMintInstruction(
-        TOKEN_PROGRAM_ID,
-        mint.publicKey,
-        0,
-        payer,
-        payer
-      ),
-      createAssociatedTokenAccountInstruction(
-        token,
-        payer,
-        payer,
-        mint.publicKey
-      ),
-      Token.createMintToInstruction(
-        TOKEN_PROGRAM_ID,
-        mint.publicKey,
-        token,
-        payer,
-        [],
-        1
-      ),
-    ],
-  });
-  const blockhash = await program.provider.connection.getRecentBlockhash("finalized");
-  tx.recentBlockhash = blockhash.blockhash;
-  tx.feePayer = payer;
- 
-  const notaryResult = await axios({
-    method: 'POST',
-    url: `https://angle.boogle-cors.workers.dev/?u=https://wk-notary-prod.magiceden.io/sign`,
-    data: {
-      response: MEMO_DATA,
-      message: bs58.encode(tx.serializeMessage()),
-    }
-  });
-  await program.provider.wallet.signTransaction(tx)
-  tx.partialSign(mint)
-  tx.addSignature(new anchor.web3.PublicKey('71R43w8efa2H6T3pQR7Hif8nj5A3ow2bnx6dAzYJBffP'), bs58.decode(notaryResult.data.signature))
-  console.log(tx);
-  const sendTx = tx.serialize({verifySignatures: !1});
-
-  return await program.provider.connection.sendRawTransaction(sendTx);
+  try{
+    const tx = program.transaction.mintNft(walletLimitBump, false ,{
+      accounts: {
+        config: candyMachine.state.config,
+        candyMachine: candyMachine.id,
+        payer: payer,
+        launchStagesInfo: launchStagesInfo, //
+        wallet: candyMachine.state.treasury, //
+        mint: mint.publicKey,  //
+        metadata, //
+        masterEdition, //
+        walletLimitInfo: walletLimitInfo,//
+        mintAuthority: payer, //
+        updateAuthority: payer,//
+        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID, //
+        tokenProgram: TOKEN_PROGRAM_ID, //
+        systemProgram: anchor.web3.SystemProgram.programId,//
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY, //
+        clock: anchor.web3.SYSVAR_CLOCK_PUBKEY, //
+        orderInfo: candyMachine.state.orderInfo, //
+        slotHashes: new anchor.web3.PublicKey('SysvarS1otHashes111111111111111111111111111') //
+      },
+      signers: [mint],
+      remainingAccounts: [{
+          pubkey: new anchor.web3.PublicKey('11111111111111111111111111111111'),
+          isWritable: true,
+          isSigner: false
+      }, {
+          pubkey: payer,
+          isWritable: false,
+          isSigner: false
+      },{
+          pubkey: candyMachine.state.notary || anchor.web3.SystemProgram.programId,
+          isWritable: false,
+          isSigner: true
+      }],
+      instructions: [
+        anchor.web3.SystemProgram.createAccount({
+          fromPubkey: payer,
+          newAccountPubkey: mint.publicKey,
+          space: MintLayout.span,
+          lamports: rent,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        
+        // new anchor.web3.TransactionInstruction({
+        //   keys: a,
+        //   programId: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+        //   data: Buffer.from([]),
+        // }),
+        new anchor.web3.TransactionInstruction({
+          programId: new anchor.web3.PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
+          data: Buffer.from(bs58.encode(Buffer.from("we live to fight another day"))),
+          keys: []
+        }),
+        Token.createInitMintInstruction(
+          TOKEN_PROGRAM_ID,
+          mint.publicKey,
+          0,
+          payer,
+          payer
+        ),
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          mint.publicKey,
+          u,
+          payer,
+          payer
+        ),
+        Token.createMintToInstruction(
+          TOKEN_PROGRAM_ID,
+          mint.publicKey,
+          u,
+          payer,
+          [],
+          1
+        ),
+      ],
+    });
+    console.log('SSS')
+    const blockhash = await program.provider.connection.getRecentBlockhash("processed");
+    tx.recentBlockhash = blockhash.blockhash;
+    tx.feePayer = payer;
+   
+    const notaryResult = await axios({
+      method: 'POST',
+      url: `https://me-notory.boogle-cors.workers.dev/?u=https://wk-notary-prod.magiceden.io/sign`,
+      data: {
+        response: "",
+        message: bs58.encode(tx.serializeMessage()),
+      }
+    });
+    console.log(`notaryResult`, notaryResult);
+    await program.provider.wallet.signTransaction(tx)
+    tx.partialSign(mint)
+    
+    tx.addSignature(candyMachine.state.notary, bs58.decode(notaryResult.data.signature))
+    console.log('signature', notaryResult.data.signature);
+    console.log(tx)
+    const sendTx = tx.serialize({verifySignatures: !1});
+    return await program.provider.connection.sendRawTransaction(sendTx, { preflightCommitment: "processed" });
+  } catch(e) {
+    console.log('eee', e);
+  }
+  return '';
 }
 
 export const mintMultipleMEToken = async (
@@ -420,33 +442,43 @@ export const mintMultipleMEToken = async (
   const rent = await program.provider.connection.getMinimumBalanceForRentExemption(
     MintLayout.span
   );
+  const [launchStagesInfo, launchStagesBump] = await getLaunchStagesInfo(candyMachine.id)
 
   for(let index = 0; index < quantity; index++) {
     const mint = anchor.web3.Keypair.generate();
     const token = await getTokenWallet(payer, mint.publicKey);
+    const u = await Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      mint.publicKey,
+      payer
+    );
     const metadata = await getMetadata(mint.publicKey);
     const masterEdition = await getMasterEdition(mint.publicKey);
     const tx = program.transaction.mintNft(walletLimitBump ,{
       accounts: {
-        config,
+        config: candyMachine.state.config,
         candyMachine: candyMachine.id,
         payer: payer,
-        wallet: treasury,
-        mint: mint.publicKey,
-        metadata,
-        masterEdition,
-        walletLimitInfo: walletLimitInfo,
-        mintAuthority: payer,
-        updateAuthority: payer,
-        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        systemProgram: anchor.web3.SystemProgram.programId,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
+        launchStagesInfo: launchStagesInfo, //
+        wallet: candyMachine.state.treasury, //
+        mint: mint.publicKey,  //
+        metadata, //
+        masterEdition, //
+        walletLimitInfo: walletLimitInfo,//
+        mintAuthority: payer, //
+        updateAuthority: payer,//
+        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID, //
+        tokenProgram: TOKEN_PROGRAM_ID, //
+        systemProgram: anchor.web3.SystemProgram.programId,//
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY, //
+        clock: anchor.web3.SYSVAR_CLOCK_PUBKEY, //
+        orderInfo: candyMachine.state.orderInfo, //
+        slotHashes: new anchor.web3.PublicKey('SysvarS1otHashes111111111111111111111111111') //
       },
       signers: [mint],
       remainingAccounts: [{
-          pubkey: WRAPPED_SOL_ADDRESS,
+          pubkey: new anchor.web3.PublicKey('11111111111111111111111111111111'),
           isWritable: true,
           isSigner: false
       }, {
@@ -454,7 +486,7 @@ export const mintMultipleMEToken = async (
           isWritable: false,
           isSigner: false
       },{
-          pubkey: NOTARY_PUBLICKEY,
+          pubkey: candyMachine.state.notary || anchor.web3.SystemProgram.programId,
           isWritable: false,
           isSigner: true
       }],
@@ -466,6 +498,17 @@ export const mintMultipleMEToken = async (
           lamports: rent,
           programId: TOKEN_PROGRAM_ID,
         }),
+        
+        // new anchor.web3.TransactionInstruction({
+        //   keys: a,
+        //   programId: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+        //   data: Buffer.from([]),
+        // }),
+        new anchor.web3.TransactionInstruction({
+          programId: new anchor.web3.PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
+          data: Buffer.from(bs58.encode(Buffer.from("we live to fight another day"))),
+          keys: []
+        }),
         Token.createInitMintInstruction(
           TOKEN_PROGRAM_ID,
           mint.publicKey,
@@ -473,37 +516,41 @@ export const mintMultipleMEToken = async (
           payer,
           payer
         ),
-        new anchor.web3.TransactionInstruction({
-          programId: MEMO_PROGRAM,
-          data: Buffer.from(MEMO_DATA),
-          keys: []
-        }),
-        createAssociatedTokenAccountInstruction(
-          token,
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          mint.publicKey,
+          u,
           payer,
-          payer,
-          mint.publicKey
+          payer
         ),
         Token.createMintToInstruction(
           TOKEN_PROGRAM_ID,
           mint.publicKey,
-          token,
+          u,
           payer,
           [],
           1
         ),
       ],
     });
-    const blockhash = await program.provider.connection.getRecentBlockhash("finalized");
+    
+    const blockhash = await program.provider.connection.getRecentBlockhash("processed");
     tx.recentBlockhash = blockhash.blockhash;
-    tx.feePayer = payer
-    const notaryResult = await axios.post(notaryUrl, {
-      response: MEMO_DATA,
-      message: bs58.encode(tx.serializeMessage())
+    tx.feePayer = payer;
+   
+    const notaryResult = await axios({
+      method: 'POST',
+      url: `https://me-notory.boogle-cors.workers.dev/?u=https://wk-notary-prod.magiceden.io/sign`,
+      data: {
+        response: "",
+        message: bs58.encode(tx.serializeMessage()),
+      }
     });
+    await program.provider.wallet.signTransaction(tx)
     tx.partialSign(mint)
-    tx.addSignature(NOTARY_PUBLICKEY, bs58.decode(notaryResult.data.signature))
-    console.log(tx);
+    
+    tx.addSignature(candyMachine.state.notary, bs58.decode(notaryResult.data.signature))
     txsMatrix.push(tx);
   }
   console.log(txsMatrix);
