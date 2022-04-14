@@ -870,7 +870,8 @@ const Home = (props: HomeProps) => {
                             ItemsRedeemed: {machine ? `${machine.state.itemsRedeemed}` : ''}
                           </div>
                           <div className="machine_info">
-                            Price: {machine ? (machine.state?.price?.toNumber() || 0) / LAMPORTS_PER_SOL : ''}
+                            Price: {machine ?  Number.parseFloat(`${(machine.state?.price?.toNumber() || 0) / LAMPORTS_PER_SOL}`).toFixed(2): ''}
+
                           </div>
                           <div className="machine_info">
                             GoLiveDate: {machine ? toDate(machine.state.goLiveDate)?.toString() : ''}
@@ -1093,7 +1094,7 @@ const Home = (props: HomeProps) => {
                                   Price:
                                 </p>
                                 <p>
-                                  {machine ? (machine.state?.price?.toNumber() || 0) / LAMPORTS_PER_SOL : ''}
+                                  {machine ?  Number.parseFloat(`${(machine.state?.price?.toNumber() || 0) / LAMPORTS_PER_SOL}`).toFixed(2): ''}
                                 </p>
                               </div>
 

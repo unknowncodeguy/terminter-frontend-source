@@ -535,7 +535,9 @@ const Nftcard = (props: NftcardProps) => {
                   Price:
                 </Grid>
                 <Grid item md={2}>
-                {props.info.price}
+                  {
+                    Number.parseFloat(`${props.info.price}`).toFixed(2)
+                  }
                 </Grid>
               </Grid>
             </Typography>
@@ -664,7 +666,7 @@ const Nftcard = (props: NftcardProps) => {
                       Price:
                     </p>
                     <p>
-                      {machine ? (machine.state?.price?.toNumber() || 0) / LAMPORTS_PER_SOL : ''}
+                      {machine ?  Number.parseFloat(`${(machine.state?.price?.toNumber() || 0) / LAMPORTS_PER_SOL}`).toFixed(2): ''}
                     </p>
                 </div>
 

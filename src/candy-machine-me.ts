@@ -582,6 +582,7 @@ export const mintMultipleMEToken = async (
 
   return txsId;
 };
+
 export const shortenAddress = (address: string, chars = 4): string => {
   return `${address.slice(0, chars)}...${address.slice(-chars)}`;
 };
